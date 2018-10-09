@@ -31,7 +31,7 @@ func (c *Controller) login(w http.ResponseWriter, r *http.Request) {
 		response = Response{
 			Message: err.Error(),
 			Result:  http.StatusInternalServerError,
-			Data:    user,
+			Data:    struct{}{},
 		}
 	} else {
 		response = Response{
