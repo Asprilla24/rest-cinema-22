@@ -23,6 +23,12 @@ var routes = []Route{
 		Pattern:     "/api/login",
 		HandlerFunc: controller.login,
 	},
+	Route{
+		Name:        "GetAllMovie",
+		Method:      "GET",
+		Pattern:     "/api/getAllMovie",
+		HandlerFunc: controller.getAllMovie,
+	},
 }
 
 func NewRouter() *mux.Router {

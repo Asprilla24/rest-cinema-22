@@ -2,6 +2,7 @@ package store
 
 import (
 	"database/sql"
+	"errors"
 
 	_ "github.com/go-sql-driver/mysql"
 )
@@ -9,9 +10,17 @@ import (
 type Repository struct{}
 
 type User struct {
-	Id       string `json:"id"`
+	ID       string `json:"id"`
 	Username string `json:"username"`
 	Email    string `json:"email"`
+}
+
+type Movie struct {
+	ID        string  `json:"id"`
+	Title     string  `json:"title"`
+	Publisher string  `json:"publisher"`
+	Rating    float64 `json:"rating"`
+	Cover     string  `json:"cover"`
 }
 
 func connect() *sql.DB {
@@ -22,7 +31,9 @@ func connect() *sql.DB {
 	return db
 }
 
-func (r Repository) login(Username string, Password string) User {
+func (r Repository) login(Username string, Password string) (User, error) {
+	var result User
+
 	db := connect()
 	defer db.Close()
 
@@ -32,11 +43,38 @@ func (r Repository) login(Username string, Password string) User {
 	}
 	defer query.Close()
 
-	var result User
 	for query.Next() {
-		if err := query.Scan(&result.Id, &result.Username, &result.Email); err != nil {
+		if err := query.Scan(&result.ID, &result.Username, &result.Email); err != nil {
 			panic(err.Error())
 		}
+	}
+
+	if result.ID == "" {
+		return result, errors.New("User not found")
+	}
+
+	return result, nil
+}
+
+func (r Repository) getAllMovie() []Movie {
+	result := []Movie{}
+
+	db := connect()
+	defer db.Close()
+
+	query, err := db.Query("SELECT Id, Title, Publisher, Rating, Cover FROM Movie")
+	if err != nil {
+		panic(err.Error())
+	}
+	defer query.Close()
+
+	for query.Next() {
+		var movie Movie
+		err := query.Scan(&movie.ID, &movie.Title, &movie.Publisher, &movie.Rating, &movie.Cover)
+		if err != nil {
+			panic(err.Error())
+		}
+		result = append(result, movie)
 	}
 
 	return result
