@@ -60,6 +60,20 @@ func (c *Controller) getAllMovie(w http.ResponseWriter, r *http.Request) {
 	return
 }
 
+func (c *Controller) getAllCategory(w http.ResponseWriter, r *http.Request) {
+	result := c.Repository.getAllCategory()
+
+	response := Response{
+		Message: "",
+		Result:  http.StatusOK,
+		Data:    result,
+	}
+
+	printOut(w, response)
+
+	return
+}
+
 func printOut(w http.ResponseWriter, r Response) {
 	w.Header().Set("Content-Type", "application/json; charset=UTF-8")
 	w.Header().Set("Access-Control-Allow-Origin", "*")
